@@ -1,0 +1,833 @@
+# The sleeplab-format extractor config for STAGES dataset
+annotation_format: "json"
+new_dataset_name: "STAGES_crop_lights_off_on"
+
+series_configs:
+
+  - name: "BOGN"
+    crop_lights_off_on: true
+    ignore_subject_ids: ["BOGN00005"]  # Lights on - off > total length of recording
+    required_result_array_names: ["C4M1_64Hz_hp", "E1M2_64Hz_hp", "NasalPressure_64Hz", "Pleth_64Hz"]
+
+    filter_conds:
+    - name: "tst_less_than_32min"
+      method: "sleeplab_format.extractor.preprocess.filter_by_tst"
+      kwargs: {"min_tst_sec": 1920, "hypnogram_key": "STAGES_hypnogram"}
+
+    array_configs:
+      - name: "C4M1"
+        alt_names: ["EEG_C4-A1"]
+        actions:
+          - name: "resample"
+            method: "sleeplab_format.extractor.preprocess.resample_polyphase"
+            kwargs: {"fs_new": 64}
+            updated_attributes: {"sampling_rate": 64, "name": "C4M1_64Hz_hp"}
+
+          - name: "highpass"
+            method: "sleeplab_format.extractor.preprocess.highpass"
+            kwargs: {"cutoff": 0.3}
+
+          - name: "normalize"
+            method: "sleeplab_format.extractor.preprocess.z_score_norm"
+
+      - name: "E1M2"
+        alt_names: ["EOG_ROC-A2"]
+        actions:
+          - name: "resample"
+            method: "sleeplab_format.extractor.preprocess.resample_polyphase"
+            kwargs: {"fs_new": 64}
+            updated_attributes: {"sampling_rate": 64, "name": "E1M2_64Hz_hp"}
+
+          - name: "highpass"
+            method: "sleeplab_format.extractor.preprocess.highpass"
+            kwargs: {"cutoff": 0.3}
+
+          - name: "normalize"
+            method: "sleeplab_format.extractor.preprocess.z_score_norm"
+
+      - name: "PTAF"
+        alt_names: ["Flow_Patient2"]
+        actions:
+          - name: "resample"
+            method: "sleeplab_format.extractor.preprocess.resample_polyphase"
+            kwargs: {"fs_new": 64}
+            updated_attributes: {"sampling_rate": 64, "name": "NasalPressure_64Hz"}
+
+          - name: "highpass"
+            method: "sleeplab_format.extractor.preprocess.highpass"
+            kwargs: {"cutoff": 0.03}
+
+          - name: "normalize"
+            method: "sleeplab_format.extractor.preprocess.z_score_norm"
+      
+      - name: "Plth"
+        alt_names: ["Pleth"]
+        actions:
+          - name: "resample"
+            method: "sleeplab_format.extractor.preprocess.resample_polyphase"
+            kwargs: {"fs_new": 64}
+            updated_attributes: {"sampling_rate": 64, "name": "Pleth_64Hz"}
+          
+          - name: "normalize"
+            method: "sleeplab_format.extractor.preprocess.z_score_norm"
+
+  - name: "GSBB"
+    crop_lights_off_on: true
+
+    ignore_subject_ids: ["GSBB00009", "GSBB00010", "GSBB00011"]  # Lights on - off > total length of signals
+    required_result_array_names: ["C4M1_64Hz_hp", "E1M2_64Hz_hp", "NasalPressure_64Hz", "Pleth_64Hz"]
+
+    filter_conds:
+    - name: "tst_less_than_32min"
+      method: "sleeplab_format.extractor.preprocess.filter_by_tst"
+      kwargs: {"min_tst_sec": 1920, "hypnogram_key": "STAGES_hypnogram"}
+
+    array_configs:
+      - name: "EEG_C4-A1"
+        actions:
+          - name: "resample"
+            method: "sleeplab_format.extractor.preprocess.resample_polyphase"
+            kwargs: {"fs_new": 64}
+            updated_attributes: {"sampling_rate": 64, "name": "C4M1_64Hz_hp"}
+
+          - name: "highpass"
+            method: "sleeplab_format.extractor.preprocess.highpass"
+            kwargs: {"cutoff": 0.3}
+
+          - name: "normalize"
+            method: "sleeplab_format.extractor.preprocess.z_score_norm"
+
+      - name: "EOG_ROC-A2"
+        actions:
+          - name: "resample"
+            method: "sleeplab_format.extractor.preprocess.resample_polyphase"
+            kwargs: {"fs_new": 64}
+            updated_attributes: {"sampling_rate": 64, "name": "E1M2_64Hz_hp"}
+
+          - name: "highpass"
+            method: "sleeplab_format.extractor.preprocess.highpass"
+            kwargs: {"cutoff": 0.3}
+
+          - name: "normalize"
+            method: "sleeplab_format.extractor.preprocess.z_score_norm"
+      
+      - name: "Flow_Patient2"
+        actions:
+          - name: "resample"
+            method: "sleeplab_format.extractor.preprocess.resample_polyphase"
+            kwargs: {"fs_new": 64}
+            updated_attributes: {"sampling_rate": 64, "name": "NasalPressure_64Hz"}
+
+          - name: "highpass"
+            method: "sleeplab_format.extractor.preprocess.highpass"
+            kwargs: {"cutoff": 0.03}
+
+          - name: "normalize"
+            method: "sleeplab_format.extractor.preprocess.z_score_norm"
+
+      - name: "Pleth"
+        actions:
+          - name: "resample"
+            method: "sleeplab_format.extractor.preprocess.resample_polyphase"
+            kwargs: {"fs_new": 64}
+            updated_attributes: {"sampling_rate": 64, "name": "Pleth_64Hz"}
+          
+          - name: "normalize"
+            method: "sleeplab_format.extractor.preprocess.z_score_norm"
+
+  - name: "GSDV"
+    crop_lights_off_on: true
+
+    ignore_subject_ids: ["GSDV00035", "GSDV00003"]  # Lights on - off > recording length
+    required_result_array_names: ["C4M1_64Hz_hp", "E1M2_64Hz_hp", "NasalPressure_64Hz", "Pleth_64Hz"]
+
+    filter_conds:
+    - name: "tst_less_than_32min"
+      method: "sleeplab_format.extractor.preprocess.filter_by_tst"
+      kwargs: {"min_tst_sec": 1920, "hypnogram_key": "STAGES_hypnogram"}
+
+    array_configs:
+      - name: "EEG_C4-A1"
+        actions:
+          - name: "resample"
+            method: "sleeplab_format.extractor.preprocess.resample_polyphase"
+            kwargs: {"fs_new": 64}
+            updated_attributes: {"sampling_rate": 64, "name": "C4M1_64Hz_hp"}
+
+          - name: "highpass"
+            method: "sleeplab_format.extractor.preprocess.highpass"
+            kwargs: {"cutoff": 0.3}
+
+          - name: "normalize"
+            method: "sleeplab_format.extractor.preprocess.z_score_norm"
+
+      - name: "EOG_ROC-A2"
+        actions:
+          - name: "resample"
+            method: "sleeplab_format.extractor.preprocess.resample_polyphase"
+            kwargs: {"fs_new": 64}
+            updated_attributes: {"sampling_rate": 64, "name": "E1M2_64Hz_hp"}
+
+          - name: "highpass"
+            method: "sleeplab_format.extractor.preprocess.highpass"
+            kwargs: {"cutoff": 0.3}
+
+          - name: "normalize"
+            method: "sleeplab_format.extractor.preprocess.z_score_norm"
+      
+      - name: "Flow_Patient2"
+        actions:
+          - name: "resample"
+            method: "sleeplab_format.extractor.preprocess.resample_polyphase"
+            kwargs: {"fs_new": 64}
+            updated_attributes: {"sampling_rate": 64, "name": "NasalPressure_64Hz"}
+
+          - name: "highpass"
+            method: "sleeplab_format.extractor.preprocess.highpass"
+            kwargs: {"cutoff": 0.03}
+
+          - name: "normalize"
+            method: "sleeplab_format.extractor.preprocess.z_score_norm"
+
+      - name: "Pleth"
+        actions:
+          - name: "resample"
+            method: "sleeplab_format.extractor.preprocess.resample_polyphase"
+            kwargs: {"fs_new": 64}
+            updated_attributes: {"sampling_rate": 64, "name": "Pleth_64Hz"}
+          
+          - name: "normalize"
+            method: "sleeplab_format.extractor.preprocess.z_score_norm"
+
+  - name: "GSLH"
+    crop_lights_off_on: true
+    required_result_array_names: ["C4M1_64Hz_hp", "E1M2_64Hz_hp", "NasalPressure_64Hz", "Pleth_64Hz"]
+
+    filter_conds:
+    - name: "tst_less_than_32min"
+      method: "sleeplab_format.extractor.preprocess.filter_by_tst"
+      kwargs: {"min_tst_sec": 1920, "hypnogram_key": "STAGES_hypnogram"}
+
+    array_configs:
+      - name: "EEG_C4-A1"
+        actions:
+          - name: "resample"
+            method: "sleeplab_format.extractor.preprocess.resample_polyphase"
+            kwargs: {"fs_new": 64}
+            updated_attributes: {"sampling_rate": 64, "name": "C4M1_64Hz_hp"}
+
+          - name: "highpass"
+            method: "sleeplab_format.extractor.preprocess.highpass"
+            kwargs: {"cutoff": 0.3}
+
+          - name: "normalize"
+            method: "sleeplab_format.extractor.preprocess.z_score_norm"
+
+      - name: "EOG_ROC-A2"
+        actions:
+          - name: "resample"
+            method: "sleeplab_format.extractor.preprocess.resample_polyphase"
+            kwargs: {"fs_new": 64}
+            updated_attributes: {"sampling_rate": 64, "name": "E1M2_64Hz_hp"}
+
+          - name: "highpass"
+            method: "sleeplab_format.extractor.preprocess.highpass"
+            kwargs: {"cutoff": 0.3}
+
+          - name: "normalize"
+            method: "sleeplab_format.extractor.preprocess.z_score_norm"
+      
+      - name: "Flow_Patient2"
+        actions:
+          - name: "resample"
+            method: "sleeplab_format.extractor.preprocess.resample_polyphase"
+            kwargs: {"fs_new": 64}
+            updated_attributes: {"sampling_rate": 64, "name": "NasalPressure_64Hz"}
+
+          - name: "highpass"
+            method: "sleeplab_format.extractor.preprocess.highpass"
+            kwargs: {"cutoff": 0.03}
+
+          - name: "normalize"
+            method: "sleeplab_format.extractor.preprocess.z_score_norm"
+
+      - name: "Pleth"
+        actions:
+          - name: "resample"
+            method: "sleeplab_format.extractor.preprocess.resample_polyphase"
+            kwargs: {"fs_new": 64}
+            updated_attributes: {"sampling_rate": 64, "name": "Pleth_64Hz"}
+          
+          - name: "normalize"
+            method: "sleeplab_format.extractor.preprocess.z_score_norm"
+
+  - name: "GSSA"
+    crop_lights_off_on: true
+    required_result_array_names: ["C4M1_64Hz_hp", "E1M2_64Hz_hp", "NasalPressure_64Hz", "Pleth_64Hz"]
+
+    filter_conds:
+    - name: "tst_less_than_32min"
+      method: "sleeplab_format.extractor.preprocess.filter_by_tst"
+      kwargs: {"min_tst_sec": 1920, "hypnogram_key": "STAGES_hypnogram"}
+
+    array_configs:
+      - name: "EEG_C4-A1"
+        actions:
+          - name: "resample"
+            method: "sleeplab_format.extractor.preprocess.resample_polyphase"
+            kwargs: {"fs_new": 64}
+            updated_attributes: {"sampling_rate": 64, "name": "C4M1_64Hz_hp"}
+
+          - name: "highpass"
+            method: "sleeplab_format.extractor.preprocess.highpass"
+            kwargs: {"cutoff": 0.3}
+
+          - name: "normalize"
+            method: "sleeplab_format.extractor.preprocess.z_score_norm"
+
+      - name: "EOG_ROC-A2"
+        actions:
+          - name: "resample"
+            method: "sleeplab_format.extractor.preprocess.resample_polyphase"
+            kwargs: {"fs_new": 64}
+            updated_attributes: {"sampling_rate": 64, "name": "E1M2_64Hz_hp"}
+
+          - name: "highpass"
+            method: "sleeplab_format.extractor.preprocess.highpass"
+            kwargs: {"cutoff": 0.3}
+
+          - name: "normalize"
+            method: "sleeplab_format.extractor.preprocess.z_score_norm"
+      
+      - name: "Flow_Patient2"
+        actions:
+          - name: "resample"
+            method: "sleeplab_format.extractor.preprocess.resample_polyphase"
+            kwargs: {"fs_new": 64}
+            updated_attributes: {"sampling_rate": 64, "name": "NasalPressure_64Hz"}
+
+          - name: "highpass"
+            method: "sleeplab_format.extractor.preprocess.highpass"
+            kwargs: {"cutoff": 0.03}
+
+          - name: "normalize"
+            method: "sleeplab_format.extractor.preprocess.z_score_norm"
+
+      - name: "Pleth"
+        actions:
+          - name: "resample"
+            method: "sleeplab_format.extractor.preprocess.resample_polyphase"
+            kwargs: {"fs_new": 64}
+            updated_attributes: {"sampling_rate": 64, "name": "Pleth_64Hz"}
+          
+          - name: "normalize"
+            method: "sleeplab_format.extractor.preprocess.z_score_norm"
+
+  - name: "GSSW"
+    crop_lights_off_on: true
+    required_result_array_names: ["C4M1_64Hz_hp", "E1M2_64Hz_hp", "NasalPressure_64Hz", "Pleth_64Hz"]
+
+    filter_conds:
+    - name: "tst_less_than_32min"
+      method: "sleeplab_format.extractor.preprocess.filter_by_tst"
+      kwargs: {"min_tst_sec": 1920, "hypnogram_key": "STAGES_hypnogram"}
+
+    array_configs:
+      - name: "EEG_C4-A1"
+        actions:
+          - name: "resample"
+            method: "sleeplab_format.extractor.preprocess.resample_polyphase"
+            kwargs: {"fs_new": 64}
+            updated_attributes: {"sampling_rate": 64, "name": "C4M1_64Hz_hp"}
+
+          - name: "highpass"
+            method: "sleeplab_format.extractor.preprocess.highpass"
+            kwargs: {"cutoff": 0.3}
+
+          - name: "normalize"
+            method: "sleeplab_format.extractor.preprocess.z_score_norm"
+
+      - name: "EOG_ROC-A2"
+        actions:
+          - name: "resample"
+            method: "sleeplab_format.extractor.preprocess.resample_polyphase"
+            kwargs: {"fs_new": 64}
+            updated_attributes: {"sampling_rate": 64, "name": "E1M2_64Hz_hp"}
+
+          - name: "highpass"
+            method: "sleeplab_format.extractor.preprocess.highpass"
+            kwargs: {"cutoff": 0.3}
+
+          - name: "normalize"
+            method: "sleeplab_format.extractor.preprocess.z_score_norm"
+      
+      - name: "Flow_Patient2"
+        actions:
+          - name: "resample"
+            method: "sleeplab_format.extractor.preprocess.resample_polyphase"
+            kwargs: {"fs_new": 64}
+            updated_attributes: {"sampling_rate": 64, "name": "NasalPressure_64Hz"}
+
+          - name: "highpass"
+            method: "sleeplab_format.extractor.preprocess.highpass"
+            kwargs: {"cutoff": 0.03}
+
+          - name: "normalize"
+            method: "sleeplab_format.extractor.preprocess.z_score_norm"
+
+      - name: "Pleth"
+        actions:
+          - name: "resample"
+            method: "sleeplab_format.extractor.preprocess.resample_polyphase"
+            kwargs: {"fs_new": 64}
+            updated_attributes: {"sampling_rate": 64, "name": "Pleth_64Hz"}
+          
+          - name: "normalize"
+            method: "sleeplab_format.extractor.preprocess.z_score_norm"
+
+  - name: "MSMI"
+    crop_lights_off_on: true
+    ignore_subject_ids: ["MSMI00056", "MSMI00007"]
+    required_result_array_names: ["C4M1_64Hz_hp", "E1M2_64Hz_hp", "NasalPressure_64Hz", "Pleth_64Hz"]
+
+    filter_conds:
+    - name: "tst_less_than_32min"
+      method: "sleeplab_format.extractor.preprocess.filter_by_tst"
+      kwargs: {"min_tst_sec": 1920, "hypnogram_key": "STAGES_hypnogram"}
+
+    array_configs:
+      - name: "EEG_C4-A1"
+        actions:
+          - name: "resample"
+            method: "sleeplab_format.extractor.preprocess.resample_polyphase"
+            kwargs: {"fs_new": 64}
+            updated_attributes: {"sampling_rate": 64, "name": "C4M1_64Hz_hp"}
+
+          - name: "highpass"
+            method: "sleeplab_format.extractor.preprocess.highpass"
+            kwargs: {"cutoff": 0.3}
+
+          - name: "normalize"
+            method: "sleeplab_format.extractor.preprocess.z_score_norm"
+
+      - name: "EOG_ROC-A2"
+        alt_names: ["EOG_ROC-A12"]
+        actions:
+          - name: "resample"
+            method: "sleeplab_format.extractor.preprocess.resample_polyphase"
+            kwargs: {"fs_new": 64}
+            updated_attributes: {"sampling_rate": 64, "name": "E1M2_64Hz_hp"}
+
+          - name: "highpass"
+            method: "sleeplab_format.extractor.preprocess.highpass"
+            kwargs: {"cutoff": 0.3}
+
+          - name: "normalize"
+            method: "sleeplab_format.extractor.preprocess.z_score_norm"
+      
+      - name: "Flow_Patient2"
+        actions:
+          - name: "resample"
+            method: "sleeplab_format.extractor.preprocess.resample_polyphase"
+            kwargs: {"fs_new": 64}
+            updated_attributes: {"sampling_rate": 64, "name": "NasalPressure_64Hz"}
+          
+          - name: "highpass"
+            method: "sleeplab_format.extractor.preprocess.highpass"
+            kwargs: {"cutoff": 0.03}
+
+          - name: "normalize"
+            method: "sleeplab_format.extractor.preprocess.z_score_norm"
+
+      - name: "Pleth"
+        actions:
+          - name: "resample"
+            method: "sleeplab_format.extractor.preprocess.resample_polyphase"
+            kwargs: {"fs_new": 64}
+            updated_attributes: {"sampling_rate": 64, "name": "Pleth_64Hz"}
+          
+          - name: "normalize"
+            method: "sleeplab_format.extractor.preprocess.z_score_norm"
+
+  - name: "MSNF"
+    crop_lights_off_on: true
+    required_result_array_names: ["C4M1_64Hz_hp", "E1M2_64Hz_hp", "NasalPressure_64Hz", "Pleth_64Hz"]
+
+    filter_conds:
+    - name: "tst_less_than_32min"
+      method: "sleeplab_format.extractor.preprocess.filter_by_tst"
+      kwargs: {"min_tst_sec": 1920, "hypnogram_key": "STAGES_hypnogram"}
+
+    array_configs:
+      - name: "EEG_C4-A1"
+        actions:
+          - name: "resample"
+            method: "sleeplab_format.extractor.preprocess.resample_polyphase"
+            kwargs: {"fs_new": 64}
+            updated_attributes: {"sampling_rate": 64, "name": "C4M1_64Hz_hp"}
+
+          - name: "highpass"
+            method: "sleeplab_format.extractor.preprocess.highpass"
+            kwargs: {"cutoff": 0.3}
+
+          - name: "normalize"
+            method: "sleeplab_format.extractor.preprocess.z_score_norm"
+
+      - name: "C4"
+        actions:
+          - name: "ref_channel"
+            method: "sleeplab_format.extractor.preprocess.sub_ref"
+            ref_name: "M1"
+
+          - name: "resample"
+            method: "sleeplab_format.extractor.preprocess.resample_polyphase"
+            kwargs: {"fs_new": 64}
+            updated_attributes: {"sampling_rate": 64, "name": "C4M1_64Hz_hp"}
+
+          - name: "highpass"
+            method: "sleeplab_format.extractor.preprocess.highpass"
+            kwargs: {"cutoff": 0.3}
+
+          - name: "normalize"
+            method: "sleeplab_format.extractor.preprocess.z_score_norm"
+
+      - name: "EOG_ROC-A2"
+        alt_names: ["EOG_ROC-A12"]
+        actions:
+          - name: "resample"
+            method: "sleeplab_format.extractor.preprocess.resample_polyphase"
+            kwargs: {"fs_new": 64}
+            updated_attributes: {"sampling_rate": 64, "name": "E1M2_64Hz_hp"}
+
+          - name: "highpass"
+            method: "sleeplab_format.extractor.preprocess.highpass"
+            kwargs: {"cutoff": 0.3}
+
+          - name: "normalize"
+            method: "sleeplab_format.extractor.preprocess.z_score_norm"
+      
+      - name: "R-EOG"
+        actions:
+          - name: "ref_channel"
+            method: "sleeplab_format.extractor.preprocess.sub_ref"
+            ref_name: "M2"
+
+          - name: "resample"
+            method: "sleeplab_format.extractor.preprocess.resample_polyphase"
+            kwargs: {"fs_new": 64}
+            updated_attributes: {"sampling_rate": 64, "name": "E1M2_64Hz_hp"}
+
+          - name: "highpass"
+            method: "sleeplab_format.extractor.preprocess.highpass"
+            kwargs: {"cutoff": 0.3}
+
+          - name: "normalize"
+            method: "sleeplab_format.extractor.preprocess.z_score_norm"
+
+      - name: "Flow_Patient2"
+        alt_names: ["Cannula"]
+        actions:
+          - name: "resample"
+            method: "sleeplab_format.extractor.preprocess.resample_polyphase"
+            kwargs: {"fs_new": 64}
+            updated_attributes: {"sampling_rate": 64, "name": "NasalPressure_64Hz"}
+          
+          - name: "highpass"
+            method: "sleeplab_format.extractor.preprocess.highpass"
+            kwargs: {"cutoff": 0.03}
+
+          - name: "normalize"
+            method: "sleeplab_format.extractor.preprocess.z_score_norm"
+
+      - name: "Pleth"
+        actions:
+          - name: "resample"
+            method: "sleeplab_format.extractor.preprocess.resample_polyphase"
+            kwargs: {"fs_new": 64}
+            updated_attributes: {"sampling_rate": 64, "name": "Pleth_64Hz"}
+          
+          - name: "normalize"
+            method: "sleeplab_format.extractor.preprocess.z_score_norm"
+
+  - name: "MSQW"
+    crop_lights_off_on: true
+
+    # Too short period between lights off and on
+    ignore_subject_ids: ["MSQW00152", "MSQW00117"]
+    required_result_array_names: ["C4M1_64Hz_hp", "E1M2_64Hz_hp", "NasalPressure_64Hz", "Pleth_64Hz"]
+
+    filter_conds:
+    - name: "tst_less_than_32min"
+      method: "sleeplab_format.extractor.preprocess.filter_by_tst"
+      kwargs: {"min_tst_sec": 1920, "hypnogram_key": "STAGES_hypnogram"}
+
+    array_configs:
+      - name: "EEG_C4-A1"
+        actions:
+          - name: "resample"
+            method: "sleeplab_format.extractor.preprocess.resample_polyphase"
+            kwargs: {"fs_new": 64}
+            updated_attributes: {"sampling_rate": 64, "name": "C4M1_64Hz_hp"}
+
+          - name: "highpass"
+            method: "sleeplab_format.extractor.preprocess.highpass"
+            kwargs: {"cutoff": 0.3}
+
+          - name: "normalize"
+            method: "sleeplab_format.extractor.preprocess.z_score_norm"
+
+      - name: "EOG_ROC-A2"
+        actions:
+          - name: "resample"
+            method: "sleeplab_format.extractor.preprocess.resample_polyphase"
+            kwargs: {"fs_new": 64}
+            updated_attributes: {"sampling_rate": 64, "name": "E1M2_64Hz_hp"}
+
+          - name: "highpass"
+            method: "sleeplab_format.extractor.preprocess.highpass"
+            kwargs: {"cutoff": 0.3}
+
+          - name: "normalize"
+            method: "sleeplab_format.extractor.preprocess.z_score_norm"
+      
+      - name: "Flow_Patient2"
+        actions:
+          - name: "resample"
+            method: "sleeplab_format.extractor.preprocess.resample_polyphase"
+            kwargs: {"fs_new": 64}
+            updated_attributes: {"sampling_rate": 64, "name": "NasalPressure_64Hz"}
+          
+          - name: "highpass"
+            method: "sleeplab_format.extractor.preprocess.highpass"
+            kwargs: {"cutoff": 0.03}
+
+          - name: "normalize"
+            method: "sleeplab_format.extractor.preprocess.z_score_norm"
+
+      - name: "Pleth"
+        actions:
+          - name: "resample"
+            method: "sleeplab_format.extractor.preprocess.resample_polyphase"
+            kwargs: {"fs_new": 64}
+            updated_attributes: {"sampling_rate": 64, "name": "Pleth_64Hz"}
+          
+          - name: "normalize"
+            method: "sleeplab_format.extractor.preprocess.z_score_norm"
+
+  # - name: "MSTH"
+  # Skip, since PPG seems to be missing from all patients
+
+  - name: "MSTR"
+    crop_lights_off_on: true
+    ignore_subject_ids: ["MSTR00038"]
+    required_result_array_names: ["C4M1_64Hz_hp", "E1M2_64Hz_hp", "NasalPressure_64Hz", "Pleth_64Hz"]
+
+    filter_conds:
+    - name: "tst_less_than_32min"
+      method: "sleeplab_format.extractor.preprocess.filter_by_tst"
+      kwargs: {"min_tst_sec": 1920, "hypnogram_key": "STAGES_hypnogram"}
+
+    array_configs:
+      - name: "C4"
+        actions:
+          - name: "ref_channel"
+            method: "sleeplab_format.extractor.preprocess.sub_ref"
+            ref_name: "M1"
+            alt_ref_names: ["A1"]
+
+          - name: "resample"
+            method: "sleeplab_format.extractor.preprocess.resample_polyphase"
+            kwargs: {"fs_new": 64}
+            updated_attributes: {"sampling_rate": 64, "name": "C4M1_64Hz_hp"}
+
+          - name: "highpass"
+            method: "sleeplab_format.extractor.preprocess.highpass"
+            kwargs: {"cutoff": 0.3}
+
+          - name: "normalize"
+            method: "sleeplab_format.extractor.preprocess.z_score_norm"
+
+      - name: "E1"
+        alt_names: ["R-EOG"]
+        actions:
+          - name: "ref_channel"
+            method: "sleeplab_format.extractor.preprocess.sub_ref"
+            ref_name: "M2"
+            alt_ref_names: ["A1"]
+
+          - name: "resample"
+            method: "sleeplab_format.extractor.preprocess.resample_polyphase"
+            kwargs: {"fs_new": 64}
+            updated_attributes: {"sampling_rate": 64, "name": "E1M2_64Hz_hp"}
+
+          - name: "highpass"
+            method: "sleeplab_format.extractor.preprocess.highpass"
+            kwargs: {"cutoff": 0.3}
+
+          - name: "normalize"
+            method: "sleeplab_format.extractor.preprocess.z_score_norm"
+      
+      - name: "Nasal_Pressure"
+        alt_names: ["NASAL_PRESSURE"]
+        actions:
+          - name: "resample"
+            method: "sleeplab_format.extractor.preprocess.resample_polyphase"
+            kwargs: {"fs_new": 64}
+            updated_attributes: {"sampling_rate": 64, "name": "NasalPressure_64Hz"}
+          
+          - name: "highpass"
+            method: "sleeplab_format.extractor.preprocess.highpass"
+            kwargs: {"cutoff": 0.03}
+
+          - name: "normalize"
+            method: "sleeplab_format.extractor.preprocess.z_score_norm"
+
+      - name: "Pleth"
+        actions:
+          - name: "resample"
+            method: "sleeplab_format.extractor.preprocess.resample_polyphase"
+            kwargs: {"fs_new": 64}
+            updated_attributes: {"sampling_rate": 64, "name": "Pleth_64Hz"}
+          
+          - name: "normalize"
+            method: "sleeplab_format.extractor.preprocess.z_score_norm"
+
+  - name: "STLK"
+    crop_lights_off_on: true
+    ignore_subject_ids: ["STLK00017", "STLK00024", "STLK00003", "STLK00064"]
+    required_result_array_names: ["C4M1_64Hz_hp", "E1M2_64Hz_hp", "NasalPressure_64Hz", "Pleth_64Hz"]
+
+    filter_conds:
+    - name: "tst_less_than_32min"
+      method: "sleeplab_format.extractor.preprocess.filter_by_tst"
+      kwargs: {"min_tst_sec": 1920, "hypnogram_key": "STAGES_hypnogram"}
+
+    array_configs:
+      - name: "C4-M1"
+        actions:
+          - name: "resample"
+            method: "sleeplab_format.extractor.preprocess.resample_polyphase"
+            kwargs: {"fs_new": 64}
+            updated_attributes: {"sampling_rate": 64, "name": "C4M1_64Hz_hp"}
+
+          - name: "highpass"
+            method: "sleeplab_format.extractor.preprocess.highpass"
+            kwargs: {"cutoff": 0.3}
+
+          - name: "normalize"
+            method: "sleeplab_format.extractor.preprocess.z_score_norm"
+
+      - name: "E1"
+        # Note: No reference channels available
+        actions:
+          - name: "resample"
+            method: "sleeplab_format.extractor.preprocess.resample_polyphase"
+            kwargs: {"fs_new": 64}
+            updated_attributes: {"sampling_rate": 64, "name": "E1M2_64Hz_hp"}
+
+          - name: "highpass"
+            method: "sleeplab_format.extractor.preprocess.highpass"
+            kwargs: {"cutoff": 0.3}
+
+          - name: "normalize"
+            method: "sleeplab_format.extractor.preprocess.z_score_norm"
+      
+      - name: "PTAF"
+        actions:
+          - name: "resample"
+            method: "sleeplab_format.extractor.preprocess.resample_polyphase"
+            kwargs: {"fs_new": 64}
+            updated_attributes: {"sampling_rate": 64, "name": "NasalPressure_64Hz"}
+          
+          - name: "highpass"
+            method: "sleeplab_format.extractor.preprocess.highpass"
+            kwargs: {"cutoff": 0.03}
+
+          - name: "normalize"
+            method: "sleeplab_format.extractor.preprocess.z_score_norm"
+
+      - name: "Plesmo"
+        actions:
+          - name: "resample"
+            method: "sleeplab_format.extractor.preprocess.resample_polyphase"
+            kwargs: {"fs_new": 64}
+            updated_attributes: {"sampling_rate": 64, "name": "Pleth_64Hz"}
+          
+          - name: "normalize"
+            method: "sleeplab_format.extractor.preprocess.z_score_norm"
+
+  - name: "STNF"
+    crop_lights_off_on: true
+    ignore_subject_ids: ["STNF00373", "STNF00071", "STNF00228", "STNF00007", "STNF00496"]
+    required_result_array_names: ["C4M1_64Hz_hp", "E1M2_64Hz_hp", "NasalPressure_64Hz", "Pleth_64Hz"]
+
+    filter_conds:
+    - name: "tst_less_than_32min"
+      method: "sleeplab_format.extractor.preprocess.filter_by_tst"
+      kwargs: {"min_tst_sec": 1920, "hypnogram_key": "STAGES_hypnogram"}
+
+    array_configs:
+      - name: "C4"
+        actions:
+          - name: "ref_channel"
+            method: "sleeplab_format.extractor.preprocess.sub_ref"
+            ref_name: "M1"
+            alt_ref_names: ["A1"]
+
+          - name: "resample"
+            method: "sleeplab_format.extractor.preprocess.resample_polyphase"
+            kwargs: {"fs_new": 64}
+            updated_attributes: {"sampling_rate": 64, "name": "C4M1_64Hz_hp"}
+
+          - name: "highpass"
+            method: "sleeplab_format.extractor.preprocess.highpass"
+            kwargs: {"cutoff": 0.3}
+
+          - name: "normalize"
+            method: "sleeplab_format.extractor.preprocess.z_score_norm"
+
+      - name: "E1"
+        alt_names: ["EOG1"]
+        actions:
+          - name: "ref_channel"
+            method: "sleeplab_format.extractor.preprocess.sub_ref"
+            ref_name: "M2"
+            alt_ref_names: ["A1"]
+
+          - name: "resample"
+            method: "sleeplab_format.extractor.preprocess.resample_polyphase"
+            kwargs: {"fs_new": 64}
+            updated_attributes: {"sampling_rate": 64, "name": "E1M2_64Hz_hp"}
+
+          - name: "highpass"
+            method: "sleeplab_format.extractor.preprocess.highpass"
+            kwargs: {"cutoff": 0.3}
+
+          - name: "normalize"
+            method: "sleeplab_format.extractor.preprocess.z_score_norm"
+      
+      - name: "NasalSn"
+        alt_names: ["Nasal"]
+        actions:
+          - name: "resample"
+            method: "sleeplab_format.extractor.preprocess.resample_polyphase"
+            kwargs: {"fs_new": 64}
+            updated_attributes: {"sampling_rate": 64, "name": "NasalPressure_64Hz"}
+
+          - name: "highpass"
+            method: "sleeplab_format.extractor.preprocess.highpass"
+            kwargs: {"cutoff": 0.03}
+          
+          - name: "normalize"
+            method: "sleeplab_format.extractor.preprocess.z_score_norm"
+
+      - name: "PPG"
+        alt_names: ["Pleth"]
+        actions:
+          - name: "resample"
+            method: "sleeplab_format.extractor.preprocess.resample_polyphase"
+            kwargs: {"fs_new": 64}
+            updated_attributes: {"sampling_rate": 64, "name": "Pleth_64Hz"}
+          
+          - name: "normalize"
+            method: "sleeplab_format.extractor.preprocess.z_score_norm"

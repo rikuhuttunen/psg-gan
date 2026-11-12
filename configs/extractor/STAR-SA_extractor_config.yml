@@ -1,0 +1,77 @@
+# The sleeplab-format extractor config for STAR-SA dataset
+annotation_format: "json"
+new_dataset_name: "STAR-SA_extracted"
+
+series_configs:
+
+  - name: "PSG"
+    crop_lights_off_on: false  # These are missing from the data
+
+    # Missing manual scorings
+    ignore_subject_ids: ["20016", "20017", "20031", "20046", "20047", "20069"]
+
+    array_configs:
+
+      - name: "C4"
+        actions:
+
+          - name: "ref_channel"
+            method: "sleeplab_format.extractor.preprocess.sub_ref"
+            ref_name: "M1"
+
+          - name: "resample"
+            method: "sleeplab_format.extractor.preprocess.resample_polyphase"
+            kwargs: {"fs_new": 64}
+            updated_attributes: {"sampling_rate": 64, "name": "C4M1_64Hz_hp"}
+
+          - name: "highpass"
+            method: "sleeplab_format.extractor.preprocess.highpass"
+            kwargs: {"cutoff": 0.3}
+
+          - name: "normalize"
+            method: "sleeplab_format.extractor.preprocess.z_score_norm"
+
+      - name: "E1"
+        actions:
+
+          - name: "ref_channel"
+            method: "sleeplab_format.extractor.preprocess.sub_ref"
+            ref_name: "M2"
+
+          - name: "resample"
+            method: "sleeplab_format.extractor.preprocess.resample_polyphase"
+            kwargs: {"fs_new": 64}
+            updated_attributes: {"sampling_rate": 64, "name": "E1M2_64Hz_hp"}
+
+          - name: "highpass"
+            method: "sleeplab_format.extractor.preprocess.highpass"
+            kwargs: {"cutoff": 0.3}
+
+          - name: "normalize"
+            method: "sleeplab_format.extractor.preprocess.z_score_norm"
+
+      - name: "Nasal Pressure"
+        actions:
+
+          - name: "resample"
+            method: "sleeplab_format.extractor.preprocess.resample_polyphase"
+            kwargs: {"fs_new": 64}
+            updated_attributes: {"sampling_rate": 64, "name": "NasalPressure_64Hz"}
+
+          - name: "highpass"
+            method: "sleeplab_format.extractor.preprocess.highpass"
+            kwargs: {"cutoff": 0.03}
+
+          - name: "normalize"
+            method: "sleeplab_format.extractor.preprocess.z_score_norm"
+
+      - name: "Pleth"
+        actions:
+
+          - name: "resample"
+            method: "sleeplab_format.extractor.preprocess.resample_polyphase"
+            kwargs: {"fs_new": 64}
+            updated_attributes: {"sampling_rate": 64, "name": "Pleth_64Hz"}
+
+          - name: "normalize"
+            method: "sleeplab_format.extractor.preprocess.z_score_norm"

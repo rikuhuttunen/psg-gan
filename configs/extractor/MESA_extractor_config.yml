@@ -1,0 +1,87 @@
+# The sleeplab-format extractor config for MESA dataset
+annotation_format: "json"
+new_dataset_name: "MESA_crop_lights_off_on"
+
+series_configs:
+
+  - name: "psg"
+    crop_lights_off_on: true
+
+    filter_conds:
+      - name: "tst_less_than_1h"
+        method: "sleeplab_format.extractor.preprocess.filter_by_tst"
+        kwargs: {"min_tst_sec": 3600.0, "hypnogram_key": "nsrr_hypnogram"}
+
+    array_configs:
+
+      - name: "EEG3"
+        actions:
+          
+          - name: "resample"
+            method: "sleeplab_format.extractor.preprocess.resample_polyphase"
+            kwargs: {"fs_new": 64}
+            updated_attributes: {"sampling_rate": 64, "name": "C4M1_64Hz_hp"}
+          
+          - name: "highpass"
+            method: "sleeplab_format.extractor.preprocess.highpass"
+            kwargs: {"cutoff": 0.3}
+
+          - name: "normalize"
+            method: "sleeplab_format.extractor.preprocess.z_score_norm"
+
+      - name: "EOG-L"
+        actions:
+          - name: "resample"
+            method: "sleeplab_format.extractor.preprocess.resample_polyphase"
+            kwargs: {"fs_new": 64}
+            updated_attributes: {"sampling_rate": 64, "name": "E1Fpz_64Hz_hp"}
+          
+          - name: "highpass"
+            method: "sleeplab_format.extractor.preprocess.highpass"
+            kwargs: {"cutoff": 0.3}
+
+          - name: "normalize"
+            method: "sleeplab_format.extractor.preprocess.z_score_norm"
+
+      - name: "Flow"
+
+        actions:
+          
+          - name: "resample"
+            method: "sleeplab_format.extractor.preprocess.resample_polyphase"
+            kwargs: {"fs_new": 64}
+            updated_attributes: {"sampling_rate": 64, "name": "NasalPressure_64Hz"}
+
+          - name: "highpass"
+            method: "sleeplab_format.extractor.preprocess.highpass"
+            kwargs: {"cutoff": 0.03}
+
+          - name: "normalize"
+            method: "sleeplab_format.extractor.preprocess.z_score_norm"
+
+      - name: "Pleth"
+
+        actions:
+          
+          - name: "resample"
+            method: "sleeplab_format.extractor.preprocess.resample_polyphase"
+            kwargs: {"fs_new": 64}
+            updated_attributes: {"sampling_rate": 64, "name": "Pleth_64Hz"}
+
+          - name: "normalize"
+            method: "sleeplab_format.extractor.preprocess.z_score_norm"
+        
+      - name: "SpO2"
+        actions:
+          
+          - name: "upsample"
+            method: "sleeplab_format.extractor.preprocess.upsample_linear"
+            kwargs: {"fs_new": 64}
+            updated_attributes: {"sampling_rate": 64, "name": "SpO2_64Hz_lp"}
+          
+          - name: "lowpass"
+            method: "sleeplab_format.extractor.preprocess.lowpass"
+            kwargs: {"cutoff": 1.0}
+
+          - name: "normalize"
+            method: "sleeplab_format.extractor.preprocess.z_score_norm"

@@ -1,0 +1,299 @@
+# Configuration for simultaneous scoring of sleep stages and respiratory events
+module_str: "psg_gan.utime"
+
+model:
+  input_names:
+    - "c4m1"
+    - "e1fpz"
+    - "naspres"
+    - "ppg"
+  output_names:
+    - "hypnogram"
+    - "events"
+  aspp_depth: 48
+  block_args:
+    - {kernel_size: 5, output_filters: 32, pool_size: 8, dilation: 2, strides: 1, se_ratio: 0.25}
+    - {kernel_size: 5, output_filters: 48, pool_size: 6, dilation: 2, strides: 1, se_ratio: 0.25}
+    - {kernel_size: 5, output_filters: 64, pool_size: 4, dilation: 2, strides: 1, se_ratio: 0.25}
+    - {kernel_size: 3, output_filters: 96, pool_size: 2, dilation: 1, strides: 1, se_ratio: 0.25}
+    - {kernel_size: 3, output_filters: 128, pool_size: 2, dilation: 1, strides: 1, se_ratio: 0.25}
+    - {kernel_size: 3, output_filters: 256, pool_size: 1, dilation: 1, strides: 1, se_ratio: 0.25}
+
+  output_args:
+    - output_name: "hypnogram"
+      n_classes: 5
+      samples_per_segment: 1920
+      dense_ksize: 1
+      segment_ksize: 1
+    - output_name: "events"
+      n_classes: 3
+      samples_per_segment: 64
+      dense_ksize: 1
+      segment_ksize: 1
+
+training:
+  seed: 42
+  epochs: 150
+  steps_per_epoch: 100
+  batch_size: 8
+  peak_learning_rate: 0.01
+  lr_div_factor: 2.0
+  lr_final_div_factor: 10.0
+  ckpt_root_dir: "/research/work/rikuhut/models/psg-gan-v2/utime"
+  grain_num_workers: 2
+  grain_per_worker_buffer_size: 5
+  ema_decay: 0.99
+  loss_params: {
+    hypnogram: {gamma: 1.0, alpha: [1.0, 1.0, 0.7, 2.0, 1.0]},
+    events: {gamma: 1.0, alpha: [1.0, 1.3, 3.0]}
+  }
+
+datasets:
+  mesa:
+    ds_dir: "/research/work/rikuhut/data/slf/MESA_crop_lights_off_on"
+    series_name: "psg"
+    roi_src_type: "lights_off_on"
+    roi_src_name: ""
+
+    components:
+      c4m1:
+        src_name: "C4M1_64Hz_hp"
+        ctype: "sample_array"
+        fs: 64.0
+      e1fpz:
+        src_name: "E1Fpz_64Hz_hp"
+        ctype: "sample_array"
+        fs: 64.0
+      naspres:
+        src_name: "NasalPressure_64Hz"
+        ctype: "sample_array"
+        fs: 64.0
+      ppg:
+        src_name: "Pleth_64Hz"
+        ctype: "sample_array"
+        fs: 64.0
+      hypnogram:
+        src_name: "nsrr_hypnogram"
+        ctype: "annotation"
+        sampling_interval: 30
+        return_type: "segmentation_combined"
+        value_map:
+          W: 0
+          N1: 1
+          N2: 2
+          N3: 3
+          R: 4
+          _default: 0
+      events:
+        src_name: "hyp_desat3_nsrr_aasmevents"
+        ctype: "annotation"
+        fs: 1.0
+        return_type: "segmentation_combined"
+        value_map:
+          HYPOPNEA: 1
+          APNEA: 2
+          APNEA_OBSTRUCTIVE: 2
+          APNEA_CENTRAL: 2
+          APNEA_MIXED: 2
+          _default: 0
+
+    splits:
+      train_mesa:
+        n: 1852
+        config:
+          start_sec: -1.0  # Randomly choose start_sec at each iteration
+          duration: 3600  # Frame length in seconds
+      val_mesa:
+        n: 100
+        config:
+          start_sec: -1.0
+          duration: 3600
+      test_mesa:
+        n: 100
+        config:
+          # use whole-night signals
+          start_sec: 0.0
+          duration: -1.0
+
+  mstr:
+    ds_dir: "/research/work/rikuhut/data/slf/STAGES_crop_lights_off_on"
+    series_name: "MSTR"
+    roi_src_type: "lights_off_on"
+    roi_src_name: ""
+
+    components:
+      c4m1:
+        src_name: "C4M1_64Hz_hp"
+        ctype: "sample_array"
+        fs: 64.0
+      e1fpz:
+        src_name: "E1M2_64Hz_hp"
+        ctype: "sample_array"
+        fs: 64.0
+      naspres:
+        src_name: "NasalPressure_64Hz"
+        ctype: "sample_array"
+        fs: 64.0
+      ppg:
+        src_name: "Pleth_64Hz"
+        ctype: "sample_array"
+        fs: 64.0
+      hypnogram:
+        src_name: "STAGES_hypnogram"
+        ctype: "annotation"
+        sampling_interval: 30
+        return_type: "segmentation_combined"
+        value_map:
+          W: 0
+          N1: 1
+          N2: 2
+          N3: 3
+          R: 4
+          _default: 0
+      events:
+        src_name: "STAGES_aasmevents"
+        ctype: "annotation"
+        fs: 1.0
+        return_type: "segmentation_combined"
+        value_map:
+          HYPOPNEA: 1
+          APNEA: 2
+          APNEA_OBSTRUCTIVE: 2
+          APNEA_CENTRAL: 2
+          APNEA_MIXED: 2
+          _default: 0
+
+    splits:
+      # Total 187 recordings
+      val_mstr:
+        n: 87
+        config:
+          start_sec: -1.0  # Randomly choose start_sec at each iteration
+          duration: 3600  # Frame length in seconds 30*60
+      test_mstr:
+        n: 100
+        config:
+          start_sec: 0.0
+          duration: -1.0
+
+  starsa:
+    ds_dir: "/research/work/rikuhut/data/slf/STAR-SA_extracted"
+    series_name: "PSG"
+    roi_src_type: "annotation"
+    roi_src_name: "manually_corrected_hypnogram"
+
+    components:
+      c4m1:
+        src_name: "C4M1_64Hz_hp"
+        ctype: "sample_array"
+        fs: 64.0
+      e1fpz:
+        src_name: "E1M2_64Hz_hp"
+        ctype: "sample_array"
+        fs: 64.0
+      naspres:
+        src_name: "NasalPressure_64Hz"
+        ctype: "sample_array"
+        fs: 64.0
+      ppg:
+        src_name: "Pleth_64Hz"
+        ctype: "sample_array"
+        fs: 64.0
+      hypnogram:
+        src_name: "manually_corrected_hypnogram"
+        ctype: "annotation"
+        sampling_interval: 30
+        return_type: "segmentation_combined"
+        value_map:
+          W: 0
+          N1: 1
+          N2: 2
+          N3: 3
+          R: 4
+          _default: 0
+      events:
+        src_name: "manually_corrected_aasmevents"
+        ctype: "annotation"
+        fs: 1.0
+        return_type: "segmentation_combined"
+        value_map:
+          HYPOPNEA: 1
+          APNEA: 2
+          APNEA_OBSTRUCTIVE: 2
+          APNEA_CENTRAL: 2
+          APNEA_MIXED: 2
+          _default: 0
+
+    splits:
+      # Total 187 recordings
+      val_starsa:
+        n: 20
+        config:
+          start_sec: -1.0  # Randomly choose start_sec at each iteration
+          duration: 3600  # Frame length in seconds 30*60
+      test_starsa:
+        n: 50
+        config:
+          start_sec: 0.0
+          duration: -1.0
+
+  starhv:
+    ds_dir: "/research/work/rikuhut/data/slf/STAR-HV_extracted"
+    series_name: "PSG"
+    roi_src_type: "annotation"
+    roi_src_name: "best_weights_2021-06-14_162837.h5_hypnogram"
+
+    components:
+      c4m1:
+        src_name: "C4M1_64Hz_hp"
+        ctype: "sample_array"
+        fs: 64.0
+      e1fpz:
+        src_name: "E1M2_64Hz_hp"
+        ctype: "sample_array"
+        fs: 64.0
+      naspres:
+        src_name: "NasalPressure_64Hz"
+        ctype: "sample_array"
+        fs: 64.0
+      ppg:
+        src_name: "Pleth_64Hz"
+        ctype: "sample_array"
+        fs: 64.0
+      hypnogram:
+        src_name: "best_weights_2021-06-14_162837.h5_hypnogram"
+        ctype: "annotation"
+        sampling_interval: 30
+        return_type: "segmentation_combined"
+        value_map:
+          W: 0
+          N1: 1
+          N2: 2
+          N3: 3
+          R: 4
+          _default: 0
+      events:
+        src_name: "best_weights_2021-06-14_162837.h5_aasmevents"
+        ctype: "annotation"
+        fs: 1.0
+        return_type: "segmentation_combined"
+        value_map:
+          HYPOPNEA: 1
+          APNEA: 2
+          APNEA_OBSTRUCTIVE: 2
+          APNEA_CENTRAL: 2
+          APNEA_MIXED: 2
+          _default: 0
+
+    splits:
+      # Total 187 recordings
+      val_starhv:
+        n: 156
+        config:
+          start_sec: -1.0  # Randomly choose start_sec at each iteration
+          duration: 3600  # Frame length in seconds 30*60
+      test_starhv:
+        n: 100
+        config:
+          start_sec: 0.0
+          duration: -1.0

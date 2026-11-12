@@ -1,0 +1,80 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "psg-gan"
+dynamic = ["version"]
+description = 'Synthesizing polysomnography signals with generative adversarial nets'
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+keywords = []
+authors = [
+  { name = "Riku Huttunen" },
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Programming Language :: Python :: Implementation :: PyPy",
+]
+dependencies = [
+  "flax",
+  #"jax",  # For CPU only
+  "jax[cuda12]",  # For GPU and CPU
+  "matplotlib",
+  "mlflow",
+  "numpy",
+  "pandas",
+  "scikit-learn",
+  "scipy",
+  "seaborn",
+  "slf-grain @ git+https://github.com/rikuhuttunen/slf-grain",
+  "stylegan3-1d-flax @ git+https://github.com/rikuhuttunen/stylegan3-1d-flax",
+  "systole",
+  "tqdm"
+]
+
+# Uncomment these two lines if need to setup the virtual environment under the project folder
+# [tool.hatch.envs.default]
+# path="./venv"
+
+[project.urls]
+Documentation = "https://github.com/rikuhuttunen/psg-gan#readme"
+Issues = "https://github.com/rikuhuttunen/psg-gan/issues"
+Source = "https://github.com/rikuhuttunen/psg-gan"
+
+[tool.hatch.version]
+path = "src/psg_gan/__about__.py"
+
+[tool.hatch.envs.types]
+extra-dependencies = [
+  "mypy>=1.0.0",
+]
+[tool.hatch.envs.types.scripts]
+check = "mypy --install-types --non-interactive {args:src/psg_gan tests}"
+
+[tool.coverage.run]
+source_pkgs = ["psg_gan", "tests"]
+branch = true
+parallel = true
+omit = [
+  "src/psg_gan/__about__.py",
+]
+
+[tool.coverage.paths]
+psg_gan = ["src/psg_gan", "*/psg-gan/src/psg_gan"]
+tests = ["tests", "*/psg-gan/tests"]
+
+[tool.coverage.report]
+exclude_lines = [
+  "no cov",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+]
+
+[tool.hatch.metadata]
+allow-direct-references = true

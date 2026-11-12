@@ -1,0 +1,451 @@
+# Configuration for training the PSG-GAN model
+module_str: "psg_gan.stylegan3"
+training:
+  seed: 42
+  batch_size: 8
+  total_samples: 2000000
+  ckpt_root_dir: "/research/work/rikuhut/models/psg-gan-v2/stylegan3"
+  # Some file path where the statistics on real data needed to compute the FUD are cached
+  fud_stats_cache_path: "/tmp/fud_stats_c4_e1_naspres_ppg.npy"
+  utime_ckpt_dir: "/research/work/rikuhut/models/psg-gan-v2/utime/respected-chimp-757"
+  g_ema_decay: 0.999
+  r1_gamma: 10.0
+  log_metrics_interval_samples: 2000
+  snapshot_interval_samples: 5000
+  log_fud_interval_samples: 10000
+  n_fud_real: 20000
+  n_fud_fake: 5000
+  g_opt:
+    init_lr: 0.001
+    peak_lr: 0.001
+    end_lr: 0.0001
+    warmup_steps: 125000
+    beta1: 0.0
+    beta2: 0.99
+  d_opt:
+    init_lr: 0.001
+    peak_lr: 0.001
+    end_lr: 0.0001
+    warmup_steps: 125000
+    beta1: 0.0
+    beta2: 0.99
+    reg_interval: 4
+  
+  grain_num_workers: 4
+  grain_per_worker_buffer_size: 10
+
+model:
+  rng_seed: 42
+  width_sec: 1920
+  fs: 64
+  input_names: ["c4m1", "e1m2", "naspres", "ppg"]
+  z_dim: 512
+  w_dim: 512
+  num_mapping_layers: 3
+  mapping_lr_multiplier: 0.1
+  channel_base: 1024  # int(32768/(2**5))
+  channel_max: 256
+  num_synthesis_layers: 19
+  num_critical: 2
+  first_cutoff: 0.1
+  first_stopband: 0.12
+  last_stopband_rel: 1.1
+  margin_size: 10
+  output_scale: 1.0
+  conv_ksize: 3
+  last_conv_ksize: 3
+  filter_size: 6
+  lrelu_upsampling: 2
+  conv_clamp: null
+  magnitude_ema_beta: 0.9995
+  mbstd_group_size: 4
+  mbstd_num_new_features: 1
+  d_block_args:
+    - {features: 16, kernel_size: 3}
+    - {features: 32, kernel_size: 3}
+    - {features: 64, kernel_size: 3}
+    - {features: 128, kernel_size: 3}
+    - {features: 256, kernel_size: 3}
+    - {features: 256, kernel_size: 3}
+    - {features: 256, kernel_size: 3}
+    - {features: 256, kernel_size: 3}
+    - {features: 256, kernel_size: 3}
+    - {features: 256, kernel_size: 3}
+
+datasets:
+
+  ###########################
+  # STAGES: total 1402 PSGs #
+  ###########################
+  bogn:
+    ds_dir: "/research/work/rikuhut/data/slf/STAGES_crop_lights_off_on"
+    series_name: "BOGN"
+    roi_src_type: "lights_off_on"
+    roi_src_name: ""
+
+    components:
+      c4m1:
+        src_name: "C4M1_64Hz_hp"
+        ctype: "sample_array"
+        fs: 64.0
+      e1m2:
+        src_name: "E1M2_64Hz_hp"
+        ctype: "sample_array"
+        fs: 64.0
+      naspres:
+        src_name: "NasalPressure_64Hz"
+        ctype: "sample_array"
+        fs: 64.0
+      ppg:
+        src_name: "Pleth_64Hz"
+        ctype: "sample_array"
+        fs: 64.0
+
+    splits:
+      train:
+        n: 85
+        config:
+          start_sec: -1.0  # Randomly choose start_sec at each iteration
+          duration: 1920  # Frame length in seconds 32*60
+
+  gsbb:
+    ds_dir: "/research/work/rikuhut/data/slf/STAGES_crop_lights_off_on"
+    series_name: "GSBB"
+    roi_src_type: "lights_off_on"
+    roi_src_name: ""
+
+    components:
+      c4m1:
+        src_name: "C4M1_64Hz_hp"
+        ctype: "sample_array"
+        fs: 64.0
+      e1m2:
+        src_name: "E1M2_64Hz_hp"
+        ctype: "sample_array"
+        fs: 64.0
+      naspres:
+        src_name: "NasalPressure_64Hz"
+        ctype: "sample_array"
+        fs: 64.0
+      ppg:
+        src_name: "Pleth_64Hz"
+        ctype: "sample_array"
+        fs: 64.0
+
+    splits:
+      train:
+        n: 26
+        config:
+          start_sec: -1.0  # Randomly choose start_sec at each iteration
+          duration: 1920  # Frame length in seconds 32*60
+
+  gsdv:
+    ds_dir: "/research/work/rikuhut/data/slf/STAGES_crop_lights_off_on"
+    series_name: "GSDV"
+    roi_src_type: "lights_off_on"
+    roi_src_name: ""
+
+    components:
+      c4m1:
+        src_name: "C4M1_64Hz_hp"
+        ctype: "sample_array"
+        fs: 64.0
+      e1m2:
+        src_name: "E1M2_64Hz_hp"
+        ctype: "sample_array"
+        fs: 64.0
+      naspres:
+        src_name: "NasalPressure_64Hz"
+        ctype: "sample_array"
+        fs: 64.0
+      ppg:
+        src_name: "Pleth_64Hz"
+        ctype: "sample_array"
+        fs: 64.0
+
+    splits:
+      train:
+        n: 184
+        config:
+          start_sec: -1.0  # Randomly choose start_sec at each iteration
+          duration: 1920  # Frame length in seconds 32*60
+
+  gslh:
+    ds_dir: "/research/work/rikuhut/data/slf/STAGES_crop_lights_off_on"
+    series_name: "GSLH"
+    roi_src_type: "lights_off_on"
+    roi_src_name: ""
+
+    components:
+      c4m1:
+        src_name: "C4M1_64Hz_hp"
+        ctype: "sample_array"
+        fs: 64.0
+      e1m2:
+        src_name: "E1M2_64Hz_hp"
+        ctype: "sample_array"
+        fs: 64.0
+      naspres:
+        src_name: "NasalPressure_64Hz"
+        ctype: "sample_array"
+        fs: 64.0
+      ppg:
+        src_name: "Pleth_64Hz"
+        ctype: "sample_array"
+        fs: 64.0
+
+    splits:
+      train:
+        n: 34
+        config:
+          start_sec: -1.0  # Randomly choose start_sec at each iteration
+          duration: 1920  # Frame length in seconds 32*60
+
+  gssa:
+    ds_dir: "/research/work/rikuhut/data/slf/STAGES_crop_lights_off_on"
+    series_name: "GSSA"
+    roi_src_type: "lights_off_on"
+    roi_src_name: ""
+
+    components:
+      c4m1:
+        src_name: "C4M1_64Hz_hp"
+        ctype: "sample_array"
+        fs: 64.0
+      e1m2:
+        src_name: "E1M2_64Hz_hp"
+        ctype: "sample_array"
+        fs: 64.0
+      naspres:
+        src_name: "NasalPressure_64Hz"
+        ctype: "sample_array"
+        fs: 64.0
+      ppg:
+        src_name: "Pleth_64Hz"
+        ctype: "sample_array"
+        fs: 64.0
+
+    splits:
+      train:
+        n: 23
+        config:
+          start_sec: -1.0  # Randomly choose start_sec at each iteration
+          duration: 1920  # Frame length in seconds 32*60
+          #duration: 3840  # Frame length in seconds 64*60
+
+  gssw:
+    ds_dir: "/research/work/rikuhut/data/slf/STAGES_crop_lights_off_on"
+    series_name: "GSSW"
+    roi_src_type: "lights_off_on"
+    roi_src_name: ""
+
+    components:
+      c4m1:
+        src_name: "C4M1_64Hz_hp"
+        ctype: "sample_array"
+        fs: 64.0
+      e1m2:
+        src_name: "E1M2_64Hz_hp"
+        ctype: "sample_array"
+        fs: 64.0
+      naspres:
+        src_name: "NasalPressure_64Hz"
+        ctype: "sample_array"
+        fs: 64.0
+      ppg:
+        src_name: "Pleth_64Hz"
+        ctype: "sample_array"
+        fs: 64.0
+
+    splits:
+      train:
+        n: 77
+        config:
+          start_sec: -1.0  # Randomly choose start_sec at each iteration
+          duration: 1920  # Frame length in seconds 32*60
+
+  msmi:
+    ds_dir: "/research/work/rikuhut/data/slf/STAGES_crop_lights_off_on"
+    series_name: "MSMI"
+    roi_src_type: "lights_off_on"
+    roi_src_name: ""
+
+    components:
+      c4m1:
+        src_name: "C4M1_64Hz_hp"
+        ctype: "sample_array"
+        fs: 64.0
+      e1m2:
+        src_name: "E1M2_64Hz_hp"
+        ctype: "sample_array"
+        fs: 64.0
+      naspres:
+        src_name: "NasalPressure_64Hz"
+        ctype: "sample_array"
+        fs: 64.0
+      ppg:
+        src_name: "Pleth_64Hz"
+        ctype: "sample_array"
+        fs: 64.0
+
+    splits:
+      train:
+        n: 51
+        config:
+          start_sec: -1.0  # Randomly choose start_sec at each iteration
+          duration: 1920  # Frame length in seconds 32*60
+
+  msnf:
+    ds_dir: "/research/work/rikuhut/data/slf/STAGES_crop_lights_off_on"
+    series_name: "MSNF"
+    roi_src_type: "lights_off_on"
+    roi_src_name: ""
+
+    components:
+      c4m1:
+        src_name: "C4M1_64Hz_hp"
+        ctype: "sample_array"
+        fs: 64.0
+      e1m2:
+        src_name: "E1M2_64Hz_hp"
+        ctype: "sample_array"
+        fs: 64.0
+      naspres:
+        src_name: "NasalPressure_64Hz"
+        ctype: "sample_array"
+        fs: 64.0
+      ppg:
+        src_name: "Pleth_64Hz"
+        ctype: "sample_array"
+        fs: 64.0
+
+    splits:
+      train:
+        n: 14
+        config:
+          start_sec: -1.0  # Randomly choose start_sec at each iteration
+          duration: 1920  # Frame length in seconds 32*60
+
+  msqw:
+    ds_dir: "/research/work/rikuhut/data/slf/STAGES_crop_lights_off_on"
+    series_name: "MSQW"
+    roi_src_type: "lights_off_on"
+    roi_src_name: ""
+
+    components:
+      c4m1:
+        src_name: "C4M1_64Hz_hp"
+        ctype: "sample_array"
+        fs: 64.0
+      e1m2:
+        src_name: "E1M2_64Hz_hp"
+        ctype: "sample_array"
+        fs: 64.0
+      naspres:
+        src_name: "NasalPressure_64Hz"
+        ctype: "sample_array"
+        fs: 64.0
+      ppg:
+        src_name: "Pleth_64Hz"
+        ctype: "sample_array"
+        fs: 64.0
+
+    splits:
+      train:
+        n: 120
+        config:
+          start_sec: -1.0  # Randomly choose start_sec at each iteration
+          duration: 1920  # Frame length in seconds 32*60
+
+  mstr:
+    ds_dir: "/research/work/rikuhut/data/slf/STAGES_crop_lights_off_on"
+    series_name: "MSTR"
+    roi_src_type: "lights_off_on"
+    roi_src_name: ""
+
+    components:
+      c4m1:
+        src_name: "C4M1_64Hz_hp"
+        ctype: "sample_array"
+        fs: 64.0
+      e1m2:
+        src_name: "E1M2_64Hz_hp"
+        ctype: "sample_array"
+        fs: 64.0
+      naspres:
+        src_name: "NasalPressure_64Hz"
+        ctype: "sample_array"
+        fs: 64.0
+      ppg:
+        src_name: "Pleth_64Hz"
+        ctype: "sample_array"
+        fs: 64.0
+
+    splits:
+      train:
+        n: 187
+        config:
+          start_sec: -1.0  # Randomly choose start_sec at each iteration
+          duration: 1920  # Frame length in seconds 32*60
+
+  stlk:
+    ds_dir: "/research/work/rikuhut/data/slf/STAGES_crop_lights_off_on"
+    series_name: "STLK"
+    roi_src_type: "lights_off_on"
+    roi_src_name: ""
+
+    components:
+      c4m1:
+        src_name: "C4M1_64Hz_hp"
+        ctype: "sample_array"
+        fs: 64.0
+      e1m2:
+        src_name: "E1M2_64Hz_hp"
+        ctype: "sample_array"
+        fs: 64.0
+      naspres:
+        src_name: "NasalPressure_64Hz"
+        ctype: "sample_array"
+        fs: 64.0
+      ppg:
+        src_name: "Pleth_64Hz"
+        ctype: "sample_array"
+        fs: 64.0
+
+    splits:
+      train:
+        n: 153
+        config:
+          start_sec: -1.0  # Randomly choose start_sec at each iteration
+          duration: 1920  # Frame length in seconds 32*60
+
+  stnf:
+    ds_dir: "/research/work/rikuhut/data/slf/STAGES_crop_lights_off_on"
+    series_name: "STNF"
+    roi_src_type: "lights_off_on"
+    roi_src_name: ""
+
+    components:
+      c4m1:
+        src_name: "C4M1_64Hz_hp"
+        ctype: "sample_array"
+        fs: 64.0
+      e1m2:
+        src_name: "E1M2_64Hz_hp"
+        ctype: "sample_array"
+        fs: 64.0
+      naspres:
+        src_name: "NasalPressure_64Hz"
+        ctype: "sample_array"
+        fs: 64.0
+      ppg:
+        src_name: "Pleth_64Hz"
+        ctype: "sample_array"
+        fs: 64.0
+
+    splits:
+      train:
+        n: 448
+        config:
+          start_sec: -1.0  # Randomly choose start_sec at each iteration
+          duration: 1920  # Frame length in seconds 32*60

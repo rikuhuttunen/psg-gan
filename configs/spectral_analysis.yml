@@ -1,0 +1,75 @@
+real:
+  ds_dir: "/research/work/rikuhut/data/slf/STAGES_crop_lights_off_on"
+  series_name: ["BOGN", "GSBB", "GSDV", "GSLH", "GSSA", "GSSW", "MSMI", "MSNF", "MSQW", "MSTR", "STLK", "STNF"]
+  start_sec: 0.0
+  duration: -1.0
+  roi_src_type: "annotation"
+  roi_src_name: "respected-chimp-757_hypnogram"
+
+  components:
+    C4M1:
+      src_name: "C4M1_64Hz_hp"
+      ctype: "sample_array"
+      fs: 64.0
+    E1M2:
+      src_name: "E1M2_64Hz_hp"
+      ctype: "sample_array"
+      fs: 64.0
+    Nasal_Pressure:
+      src_name: "NasalPressure_64Hz"
+      ctype: "sample_array"
+      fs: 64.0
+    PPG:
+      src_name: "Pleth_64Hz"
+      ctype: "sample_array"
+      fs: 64.0
+    hypnogram:
+      src_name: "respected-chimp-757_hypnogram"
+      ctype: "annotation"
+      sampling_interval: 30.0
+      return_type: "segmentation_combined"
+      value_map:
+        W: 0
+        N1: 1
+        N2: 2
+        N3: 3
+        R: 4
+        _default: 0
+    
+fake:
+  ds_dir: "/research/work/rikuhut/data/slf/20261006_painted-eel-654_ema_19760"
+  series_name: "stylegan3"
+  start_sec: 0.0
+  duration: -1.0
+  roi_src_type: "annotation"
+  roi_src_name: "respected-chimp-757_hypnogram"
+
+  components:
+    C4M1:
+      src_name: "c4m1"
+      ctype: "sample_array"
+      fs: 64.0
+    E1M2:
+      src_name: "e1m2"
+      ctype: "sample_array"
+      fs: 64.0
+    Nasal_Pressure:
+      src_name: "naspres"
+      ctype: "sample_array"
+      fs: 64.0
+    PPG:
+      src_name: "ppg"
+      ctype: "sample_array"
+      fs: 64.0
+    hypnogram:
+      src_name: "respected-chimp-757_hypnogram"
+      ctype: "annotation"
+      sampling_interval: 30.0
+      return_type: "segmentation_combined"
+      value_map:
+        W: 0
+        N1: 1
+        N2: 2
+        N3: 3
+        R: 4
+        _default: 0
