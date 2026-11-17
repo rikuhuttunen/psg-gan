@@ -1,15 +1,14 @@
 # PSG-GAN
 
-[![PyPI - Version](https://img.shields.io/pypi/v/psg-gan.svg)](https://pypi.org/project/psg-gan)
-[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/psg-gan.svg)](https://pypi.org/project/psg-gan)
+Code related to the study described in the manuscript by Huttunen et. al. "From real to synthetic: PSG-GAN learns sleep apnea signal dynamics for AI training".
 
-------
+## System requirements
 
-Code related to the study described in the manuscript by Huttunen et. al. "From real to synthetic: PSG-GAN learns sleep apnea signal dynamics for AI training". Everything has been developed on Linux with Python 3.12. Nothing has been tested.
+The model training and analyses were performed on a [SLURM](https://slurm.schedmd.com/overview.html) cluster running Rocky Linux 9 provided by the UEF Bioinformatics Center. The training was performed on a single node with an NVIDIA A100 40 GB GPU. Python 3.12 was used.
 
 ## Installation
 
-Go to the directory where you want to install and create/activate the python environment however you want. Then, clone the repository and install with pip:
+Go to the directory where you want to install and create/activate the Python 3.12 environment e.g. with venv or conda. Then, clone the repository and install with pip:
 ```console
 git clone https://github.com/rikuhuttunen/psg-gan.git
 cd psg-gan
@@ -18,7 +17,7 @@ pip install -e .
 
 ## Preparing the datasets
 
-The STAGES and MESA datasets can be obtained through the National Sleep Research Resource. There are scripts to convert the MESA and STAGES datasets to sleeplab-format in https://github.com/UEF-SmartSleepLab/sleeplab-converters. 
+The [STAGES](https://sleepdata.org/datasets/stages) and [MESA](https://sleepdata.org/datasets/mesa) datasets can be obtained through the National Sleep Research Resource. There are scripts to convert the MESA and STAGES datasets to sleeplab-format in https://github.com/UEF-SmartSleepLab/sleeplab-converters. 
 
 The STAR-SA and STAR-HV datasets are currently under the process of making them publicly available.
 
@@ -29,7 +28,7 @@ slf-extract -s <STAGES SLF dir> -d <extracted data dir> -c config/extactor/STAGE
 
 ## Training the automatic scoring model
 
-Training the model used in the paper took 5 hours using a single NVIDIA A100 GPU with 40 GB memory. The models are implemented in Jax/Flax. MLFlow is used to track model training. After the extraction of the datasets, a simultaneous scoring model for sleep stages and respiratory events can be trained with:
+Training the model used in the paper took 5 hours using a single NVIDIA A100 GPU with 40 GB memory. The models were implemented in Jax/Flax. [MLFlow](https://mlflow.org/docs/latest/ml/) was used to track model training. After the extraction of the datasets, a simultaneous scoring model for sleep stages and respiratory events can be trained with:
 ```console
 python src/psg_gan/train.py \
     --param-path configs/utime_real.yml \
@@ -38,7 +37,7 @@ python src/psg_gan/train.py \
     --mlflow-experiment psg-gan
 ```
 
-where `--visible-device` is the CUDA device numer, `mlflow-tracking-uri` is the URI for an MLFlow tracking server, and `--mlflow-experiment` is some name for the MLFlow experiment. The resulting model wil be saved in `ckpt_root_dir` defined in the config file. The `ds_dir` entries in the config file need to be changed to point to the extracted SLF datasets.
+where `--visible-device` is the CUDA device numer, `mlflow-tracking-uri` is the URI for an MLFlow tracking server, and `--mlflow-experiment` is some name for the MLFlow experiment. More information on how to setup the MLFlow server can be found [in their documentation](https://mlflow.org/docs/latest/self-hosting/architecture/tracking-server/). The resulting model wil be saved in `ckpt_root_dir` defined in the config file. The `ds_dir` entries in the config file need to be changed to point to the extracted SLF datasets.
 
 ## Training the GAN
 
@@ -85,9 +84,17 @@ python src/psg_gan/utime/scorer.py \
 
 Python scripts for reproducing the analyses from the manuscript are provided under `src/psg_gan`.
 
+- demographic_info.py outputs the demographic information in latex tables
+- paper_plot_confmats.py was used to plot all confusion matrices used in the manuscript
+- plot_training_progression.py was used to plot the FUD, generator loss and discriminator loss using a CSV exported from the MLFlow UI
+- plot_subject_with_ihr.py was used to plot the example signals in the manuscript
+- spectral_analysis.py was used to plot the EEG and EOG bandpowers, and sleep stage counts
+- prv_frequency_analysis.py was used to the PRV bandpowers
+- prv_analysis.py was used to plot the median inter-beat intervals during and after breathing obstructions, as well as statistics on counts and durations of apneas and hypopneas
+
 ## Using SLURM
 
-There are scripts for training and using the models using SLURM under `slurm/`.
+There are scripts for training and using the models in a SLURM environment under `slurm/`.
 
 ## License
 
