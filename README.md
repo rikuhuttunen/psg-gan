@@ -1,6 +1,6 @@
 # PSG-GAN
 
-Code related to the study described in the manuscript by Huttunen et. al. "From real to synthetic: PSG-GAN learns sleep apnea signal dynamics for AI training".
+Code related to the study described in the manuscript by Huttunen et. al. "From real to synthetic: PSG-GAN learns sleep apnea signal dynamics for AI training" (submitted for review; [arXiv preprint](https://arxiv.org/abs/2611.24436)).
 
 ## System requirements
 
